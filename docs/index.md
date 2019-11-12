@@ -3,7 +3,7 @@ layout: default
 title:  Home
 ---
 
-<img src="https://github.com/christineh777/MineDelivery/blob/master/docs/minecraft.jpg">
+<img src="https://github.com/christineh777/MineDelivery/blob/master/docs/minecraft.JPG">
 
 ## Welcome to MineDelivery!
 
