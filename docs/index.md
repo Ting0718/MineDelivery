@@ -3,6 +3,7 @@ layout: default
 title:  Home
 ---
 
+![Alt Text](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.theverge.com%2F2019%2F3%2F12%2F18262243%2Fminecraft-xbox-game-pass-microsoft-subscription&psig=AOvVaw2QORsAHYxm60bSA3oerctT&ust=1573609405668000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCNDD4IDG4-UCFQAAAAAdAAAAABAD)
 Source code: https://github.com/USER/PROJECT (_fix this_)
 
 Reports:
@@ -11,30 +12,4 @@ Reports:
 - [Status](status.html)
 - [Final](final.html)
 
-What's Markdown (`.md`)?
 
-Markdown is markup that lets you write hypertext (HTML) documents
-in easy-to-read and easy-to-write plain text.
-No angle brackets `<></>` required for
-paragraphs, lists, blockquotes, tables, etc.
-
-
-This is a paragraph (in Markdown). Some more
-text here.
-
-This is another paragraph.
-
-This is a list:
-
-- Orange
-- Apple
-- Blueberry
-
-$$x^2 = y^2$$
-
-
-Just getting started with Markdown?
-See the [HTML <-> Markdown Quick Reference (Cheat Sheet)][quickref].
-
-
-[quickref]: https://github.com/mundimark/quickrefs/blob/master/HTML.md
