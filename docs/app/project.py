@@ -15,8 +15,11 @@ from collections import defaultdict, deque
 from timeit import default_timer as timer
 from priority_dict import priorityDictionary as PQ
 
-actionL= ['right', 'down', 'down', 'up', 'down', 'up']
+Best_Testing = False
+
+actionL = ['right', 'down', 'down', 'up', 'down', 'up']
 count = -1
+
 
 class House(object):
     def __init__(self, id, state, location):
@@ -25,12 +28,14 @@ class House(object):
         self.orderTime = 0
         self.location = location
 
+
 class Agent(object):
     def __init__(self):
         self.currentLocation = (0, 0)
 
+
 class world(object):
-    
+
     def __init__(self, alpha=0.3, gamma=0.8, n=1):
         self.epsilon = 0.2
         self.q_table = {}
@@ -40,16 +45,17 @@ class world(object):
         self.EventQueue = queue.PriorityQueue()
         self.House = []
         self.Clock = 0.0
-        self.Locations = [7,12,14]
+        self.Locations = [7, 12, 14]
         self.Col = 4
         self.Row = 4
         self.Agent_Location = 0
         self.initialize()
 
     def dijkstra_shortest_path(self, grid_obs, source, dest):
-    
-    
-        #------------------------------------
+        if source == dest or source == 0:
+            return []
+
+        # ------------------------------------
         #
         #   Fill and submit this code
         #
@@ -66,10 +72,10 @@ class world(object):
             else:
                 predecessors[i] = -1
                 distance.append(math.inf)
-        
+
         pq[source] = 0
 
-        while(len(pq) != 0):
+        while (len(pq) != 0):
 
             index = pq.smallest()
             del pq[index]
@@ -82,23 +88,34 @@ class world(object):
                     temp = predecessors[temp]
                 path.reverse()
 
-            if(visited[index] == False):
+            if (visited[index] == False):
                 visited[index] = True
 
-                neighbors = [index-1, index+1, index+21, index-21]
+                neighbors = []
+                if index - 1 >= 0 and index % self.Row != 0 and grid_obs[index - 1] != "House":
+                    neighbors.append(index - 1)
+
+                if index + 1 < len(grid_obs) and (index + 1) % self.Row != 0 and grid_obs[index + 1] != "House":
+                    neighbors.append(index + 1)
+
+                if index + self.Row < len(grid_obs) and grid_obs[index + self.Row] != "House":
+                    neighbors.append(index + self.Row)
+
+                if index - self.Row >= 0 and grid_obs[index - self.Row] != "House":
+                    neighbors.append(index - self.Row)
+
+                # neighbors = [index-1, index+1, index+self.Row, index-self.Row]
 
                 for n in neighbors:
-                    if n >= 0 and n < len(grid_obs) and grid_obs[n] != "house":
-                        
+                    if n >= 0 and n < len(grid_obs) and grid_obs[n] != "House":
+
                         if distance[n] > distance[index] + 1:
                             distance[n] = distance[index] + 1
                             predecessors[n] = index
                             pq[n] = distance[n]
 
-
-
         return path
-        #-------------------------------------
+        # -------------------------------------
 
     def extract_action_list_from_path(self, path_list):
         """
@@ -110,74 +127,104 @@ class world(object):
         Returns
             action_list: <list> list of string discrete action commands (e.g. ['movesouth 1', 'movewest 1', ...]
         """
-        action_trans = {-21: 'movenorth 1', 21: 'movesouth 1', -1: 'movewest 1', 1: 'moveeast 1'}
+        action_trans = {-self.Row: 'movesouth 1', self.Row: 'movenorth 1', -1: 'moveeast 1', 1: 'movewest 1'}
         alist = []
         for i in range(len(path_list) - 1):
             curr_block, next_block = path_list[i:(i + 2)]
             alist.append(action_trans[next_block - curr_block])
+            alist.append(action_trans[next_block - curr_block])
 
         return alist
 
-
-    
     def initialize(self):
+        move = {'movenorth 1': 4, 'movesouth': -4, 'moveeast': -1, 'movewest': 1}
+
+        global Best_Testing
+        Best_Testing = False
         self.EventQueue = queue.PriorityQueue()
         self.House = []
         self.Clock = 0.0
-        self.Agent_Location = 0
         self.epsilon = 0.2
-        
-        for i in range(3):
-            self.House.append(House(i,False,self.Locations[i]))
-        self.EventQueue.put((5,self.House[0]))
-        self.EventQueue.put((2,self.House[1]))
-        self.EventQueue.put((4,self.House[2]))
+        origin = self.Agent_Location
+        self.Agent_Location = 0
+        # self.Agent_Location = 0
+
+        # print("+++++++++++++++++++++++++++")
+        # print("Origin",origin, "to", 0)
+
+        grid = ['E' for i in range(self.Row * self.Col)]
+        for i in self.House:
+            grid[i.location] = 'House'
+
+        path = self.dijkstra_shortest_path(grid, origin, 0)
+        # print("Path: ",path)
+        extract_action_list = self.extract_action_list_from_path(path)
+
        
+        for i in extract_action_list:
+            time.sleep(0.1)
+            self.execute_actions(agent_host, i)
+
+        self.Agent_Location = 0
+        time.sleep(1)
+
+        assert self.Agent_Location == 0
+
+
+        # print(self.Agent_Location)
+
+        for i in range(3):
+            self.House.append(House(i, False, self.Locations[i]))
+        self.EventQueue.put((5, self.House[0]))
+        self.EventQueue.put((2, self.House[1]))
+        self.EventQueue.put((4, self.House[2]))
 
     def get_curr_state(self):
-        return [i for i in self.House]+[self.Agent_Location]
+        return [i for i in self.House] + [self.Agent_Location]
 
     def execute_actions(self, agent_host, action):
         time.sleep(0.1)
         agent_host.sendCommand(action)
         world_state = agent_host.getWorldState()
         for error in world_state.errors:
-            print("Error:",error.text)
-
+            print("Error:", error.text)
 
     def act(self, dir, agent_host):
         # print("location is: " + loc)
+        global Best_Testing
         cmd = ''
         if dir == 'up':
             loc = self.Agent_Location - self.Row
-            cmd = 'movenorth 1'
+            cmd = 'movesouth 1'
         if dir == 'down':
             loc = self.Agent_Location + self.Row
-            cmd = 'movesouth 1'
+            cmd = 'movenorth 1'
         if dir == 'left':
             loc = self.Agent_Location - 1
-            cmd = 'movewest 1'
+            cmd = 'moveeast 1'
         if dir == 'right':
             loc = self.Agent_Location + 1
-            cmd = 'moveeast 1'
+            cmd = 'movewest 1'
 
         self.Agent_Location = loc
-        self.execute_actions(agent_host, cmd)
+        if not Best_Testing:
+            self.execute_actions(agent_host, cmd)
+            self.execute_actions(agent_host, cmd)
 
-        
         # print("------------------")
         # print(self.Clock)
-        # print("Agent",self.Agent_Location)
+        # print("Agent",cmd, "to", self.Agent_Location)
         # for i in self.House:
         #     print(i.id, i.state)
 
         for i in self.House:
             if i.location in self.get_adj(loc) and i.state == True:
+                # print("Change the house", i.id)
                 i.state = False
-                return 1000-(self.Clock - i.orderTime)
+                return 1000 - (self.Clock - i.orderTime)
         return 0
 
-    def get_adj(self,loc):
+    def get_adj(self, loc):
 
         adj = []
 
@@ -185,10 +232,10 @@ class world(object):
             adj.append(loc + self.Row)
         if loc - self.Row >= 0:
             adj.append(loc - self.Row)
-        if (loc + 1)%self.Row != 0 :
-            adj.append(loc+1)
-        if (loc)%self.Row != 0:
-            adj.append(loc-1)
+        if (loc + 1) % self.Row != 0:
+            adj.append(loc + 1)
+        if (loc) % self.Row != 0:
+            adj.append(loc - 1)
 
         return adj
 
@@ -199,13 +246,13 @@ class world(object):
             direct.append('down')
         if self.Agent_Location - self.Row not in self.Locations and self.Agent_Location - self.Row >= 0:
             direct.append('up')
-        if self.Agent_Location + 1 not in self.Locations and (self.Agent_Location + 1)%self.Row != 0 :
+        if self.Agent_Location + 1 not in self.Locations and (self.Agent_Location + 1) % self.Row != 0:
             direct.append('right')
-        if self.Agent_Location - 1 not in self.Locations and (self.Agent_Location)%self.Row != 0:
+        if self.Agent_Location - 1 not in self.Locations and (self.Agent_Location) % self.Row != 0:
             direct.append('left')
 
         return direct
-                
+
     def choose_action(self, curr_state, possible_actions, eps):
         # if curr_state not in self.q_table:
         #     self.q_table[curr_state] = {}
@@ -216,7 +263,6 @@ class world(object):
         # global count, actionL
         # count+=1
         # return action[count]
-
 
         if curr_state not in self.q_table:
             self.q_table[curr_state] = {}
@@ -229,7 +275,7 @@ class world(object):
 
         actionProb = random.uniform(0.0, 1.0)
         # using the random move
-        if actionProb <= eps: 
+        if actionProb <= eps:
             # actionIndex = random.randint(0, len(possible_actions) - 1)
             return possible_actions[random.randint(0, len(possible_actions) - 1)]
         # using greedy action
@@ -241,7 +287,7 @@ class world(object):
                     actionList.clear()
                     maxQValue = qValue
                     actionList.append(action)
-                
+
                 elif qValue == maxQValue:
                     actionList.append(action)
             return actionList[random.randint(0, len(actionList) - 1)]
@@ -265,9 +311,9 @@ class world(object):
             direct.append('down')
         if Agent_Location - self.Row not in self.Locations and self.Agent_Location - self.Row >= 0:
             direct.append('up')
-        if Agent_Location + 1 not in self.Locations and (self.Agent_Location + 1)%self.Row != 0 :
+        if Agent_Location + 1 not in self.Locations and (self.Agent_Location + 1) % self.Row != 0:
             direct.append('right')
-        if Agent_Location - 1 not in self.Locations and (self.Agent_Location)%self.Row != 0:
+        if Agent_Location - 1 not in self.Locations and (self.Agent_Location) % self.Row != 0:
             direct.append('left')
 
         return direct
@@ -275,7 +321,8 @@ class world(object):
     def best_policy(self):
         # return [action]
         # self.epsilon = -1
-
+        global Best_Testing
+        Best_Testing = True
         returnAction = []
         s0 = self.transferCurrState(self.get_curr_state())
         possible_actions = self.get_possible_actions()
@@ -289,9 +336,8 @@ class world(object):
             if self.EventQueue.qsize() != 0 and self.Clock == self.EventQueue.queue[0][0]:
                 event_time, house = self.EventQueue.get()
                 house.state = True
-            
-            self.act(returnAction[-1], agent_host)
 
+            self.act(returnAction[-1], agent_host)
 
             if self.EventQueue.qsize() == 0 and [i.state for i in self.House] == [False, False, False]:
                 break
@@ -309,7 +355,7 @@ class world(object):
         curr_s = S.popleft()
         curr_a = A.popleft()
         curr_r = R.popleft()
-        
+
         nextMaxReward = 0
 
         G = sum([self.gamma ** i * R[i] for i in range(len(S))])
@@ -325,17 +371,16 @@ class world(object):
         # self.q_table[curr_s][curr_a] = curr_r + self.alpha * nextMaxReward # update the q table value
 
     def run(self, agent_host):
-
         S, A, R = deque(), deque(), deque()
 
         present_reward = 0
         done_update = False
         while not done_update:
-            print("------------------")
-            print(self.Clock)
-            print("Agent",self.Agent_Location)
-            for i in self.House:
-                print(i.id, i.state)
+            # print("------------------")
+            # print(self.Clock)
+            # print("Agent",self.Agent_Location)
+            # for i in self.House:
+            #     print(i.id, i.state)
             # s0 = self.get_curr_state()
             s0 = self.transferCurrState(self.get_curr_state())
             possible_actions = self.get_possible_actions()
@@ -379,16 +424,6 @@ class world(object):
                         self.update_q_table(tau, S, A, R, T)
                     done_update = True
                     break
-        grid = ['E' for i in range(self.Row*self.Col)]
-        for i in self.House:
-            grid[i.location] = 'House'
-
-        path = self.dijkstra_shortest_path(grid,self.Agent_Location, 0)
-        extract_action_list = self.extract_action_list_from_path(path)
-
-        for i in extract_action_list:
-            self.execute_actions(agent_host, i)
-        
 
 
 def load_grid(world_state):
@@ -402,7 +437,7 @@ def load_grid(world_state):
         grid:   <list>  the world grid blocks represented as a list of blocks (see Tutorial.pdf)
     """
     while world_state.is_mission_running:
-        #sys.stdout.write(".")
+        # sys.stdout.write(".")
         time.sleep(0.1)
         world_state = agent_host.getWorldState()
         if len(world_state.errors) > 0:
@@ -447,7 +482,7 @@ if agent_host.receivedArgument("help"):
 if agent_host.receivedArgument("test"):
     num_repeats = 1
 else:
-    num_repeats = 10
+    num_repeats = 1000
 
 mission_file = './world.xml'
 with open(mission_file, 'r') as f:
@@ -464,33 +499,35 @@ my_mission.setViewpoint(1)
 
 
 max_retries = 3
-    # my_clients = MalmoPython.ClientPool()
-    # my_clients.add(MalmoPython.ClientInfo('127.0.0.1', 10000)) # add Minecraft machines here as available
+# my_clients = MalmoPython.ClientPool()
+# my_clients.add(MalmoPython.ClientInfo('127.0.0.1', 10000)) # add Minecraft machines here as available
 for retry in range(max_retries):
     try:
         agent_host.startMission(my_mission, my_mission_record)
         break
     except RuntimeError as e:
         if retry == max_retries - 1:
-            print("Error starting mission", (i+1), ":", e)
+            print("Error starting mission", (i + 1), ":", e)
             exit(1)
         else:
-            time.sleep(2)
+            time.sleep(0.1)
 
 print("Waiting for the mission to start", end=' ')
 
 for i in range(num_repeats):
     if i % 5 == 0 and i != 0:
         print("---- this is the best policy")
+        a.initialize()
         po = a.best_policy()
-        print(len(po))
+        print(len(po), po)
+        a.Agent_Location = 0
 
         # if len(po) <= 8:
         #     print("this is the solution:" + str(po))
-        a.initialize()
+
     # print("this is the q table", str(a.q_table))
 
-    print("Waiting for the mission", (i+1), "to start ",)
+    print("Waiting for the mission", (i + 1), "to start ", )
     world_state = agent_host.getWorldState()
     while not world_state.has_mission_begun:
         time.sleep(0.1)
@@ -499,7 +536,7 @@ for i in range(num_repeats):
             print("Error:", error.text)
 
     print()
-    print("Mission", (i+1), "running.")
+    print("Mission", (i + 1), "running.")
 
     # Initialize
     a.initialize()
