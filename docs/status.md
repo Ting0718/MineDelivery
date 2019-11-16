@@ -4,7 +4,7 @@ title: Status
 ---
 
 ## Video Report
-<iframe width="500" height="300" src="https://youtu.be/yEyxJONfI3Q" frameborder="0" allowfullscreen></iframe>
+<iframe width="790" height="444" src="https://www.youtube.com/embed/yEyxJONfI3Q" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Project Summary
 Our project will simulate a city where many customers continuously order food delivery from a restaurant. Customers will make their orders with certain probability during one day. Input is the number of delivery men and locations of all customers. Our goal is to deliver foods to all customers within shortest cumulative waiting time in one day.
