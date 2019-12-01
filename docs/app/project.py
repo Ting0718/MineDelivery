@@ -14,11 +14,21 @@ import errno
 from collections import defaultdict, deque
 from timeit import default_timer as timer
 from priority_dict import priorityDictionary as PQ
+import tkinter as tk
 
 Best_Testing = False
 
 actionL = ['right', 'down', 'down', 'up', 'down', 'up']
 count = -1
+# -- set up the python-side drawing -- #
+scale = 40
+world_x = 4
+world_y = 4
+root = tk.Tk()
+root.wm_title("Q-table")
+canvas = tk.Canvas(root, width=world_x*scale, height=world_y*scale, borderwidth=0, highlightthickness=0, bg="black")
+canvas.grid()
+root.update()
 
 
 class House(object):
@@ -49,6 +59,8 @@ class world(object):
         self.Col = 4
         self.Row = 4
         self.Agent_Location = 0
+        self.canvas = canvas
+        self.root = root
         self.initialize()
 
     def dijkstra_shortest_path(self, grid_obs, source, dest):
@@ -75,7 +87,7 @@ class world(object):
 
         pq[source] = 0
 
-        while (len(pq) != 0):
+        while len(pq) != 0:
 
             index = pq.smallest()
             del pq[index]
@@ -92,6 +104,7 @@ class world(object):
                 visited[index] = True
 
                 neighbors = []
+                # print(grid_obs[(index - 1).location])
                 if index - 1 >= 0 and index % self.Row != 0 and grid_obs[index - 1] != "House":
                     neighbors.append(index - 1)
 
@@ -147,20 +160,23 @@ class world(object):
         self.epsilon = 0.2
         origin = self.Agent_Location
         self.Agent_Location = 0
-        # self.Agent_Location = 0
 
         # print("+++++++++++++++++++++++++++")
         # print("Origin",origin, "to", 0)
 
         grid = ['E' for i in range(self.Row * self.Col)]
-        for i in self.House:
-            grid[i.location] = 'House'
+        for i in self.Locations:
+        # for i in self.House:
+            # print(i.location)
+            grid[i] = 'House'
+            # grid[i.location] = 'House'
+        # print('--------')
+        # print(grid)
 
         path = self.dijkstra_shortest_path(grid, origin, 0)
         # print("Path: ",path)
         extract_action_list = self.extract_action_list_from_path(path)
 
-       
         for i in extract_action_list:
             time.sleep(0.1)
             self.execute_actions(agent_host, i)
@@ -170,7 +186,6 @@ class world(object):
 
         assert self.Agent_Location == 0
 
-
         # print(self.Agent_Location)
 
         for i in range(3):
@@ -178,6 +193,7 @@ class world(object):
         self.EventQueue.put((5, self.House[0]))
         self.EventQueue.put((2, self.House[1]))
         self.EventQueue.put((4, self.House[2]))
+        # print(self.EventQueue.queue)
 
     def get_curr_state(self):
         return [i for i in self.House] + [self.Agent_Location]
@@ -263,7 +279,6 @@ class world(object):
         # global count, actionL
         # count+=1
         # return action[count]
-
         if curr_state not in self.q_table:
             self.q_table[curr_state] = {}
         for action in possible_actions:
@@ -304,19 +319,19 @@ class world(object):
 
         return frozenset(copy_state)
 
-    def get_actions(self, Agent_Location):
-        direct = []
-
-        if Agent_Location + self.Row not in self.Locations and self.Agent_Location + self.Row < self.Row * self.Col:
-            direct.append('down')
-        if Agent_Location - self.Row not in self.Locations and self.Agent_Location - self.Row >= 0:
-            direct.append('up')
-        if Agent_Location + 1 not in self.Locations and (self.Agent_Location + 1) % self.Row != 0:
-            direct.append('right')
-        if Agent_Location - 1 not in self.Locations and (self.Agent_Location) % self.Row != 0:
-            direct.append('left')
-
-        return direct
+    # def get_actions(self, Agent_Location):
+    #     direct = []
+    #
+    #     if Agent_Location + self.Row not in self.Locations and self.Agent_Location + self.Row < self.Row * self.Col:
+    #         direct.append('down')
+    #     if Agent_Location - self.Row not in self.Locations and self.Agent_Location - self.Row >= 0:
+    #         direct.append('up')
+    #     if Agent_Location + 1 not in self.Locations and (self.Agent_Location + 1) % self.Row != 0:
+    #         direct.append('right')
+    #     if Agent_Location - 1 not in self.Locations and (self.Agent_Location) % self.Row != 0:
+    #         direct.append('left')
+    #
+    #     return direct
 
     def best_policy(self):
         # return [action]
@@ -352,6 +367,7 @@ class world(object):
 
     def update_q_table(self, tau, S, A, R, T):
         # curr_s = self.transferCurrState(S.popleft())
+        self.drawQ()
         curr_s = S.popleft()
         curr_a = A.popleft()
         curr_r = R.popleft()
@@ -425,6 +441,52 @@ class world(object):
                     done_update = True
                     break
 
+    def drawQ( self, curr_x=None, curr_y=None ):
+        if self.canvas is None or self.root is None:
+            return
+        self.canvas.delete("all")
+        action_inset = 0.1
+        action_radius = 0.1
+        curr_radius = 0.2
+        action_positions = [ ( 0.5, 1-action_inset ), ( 0.5, action_inset ), ( 1-action_inset, 0.5 ), ( action_inset, 0.5 ) ]
+        for x in range(world_x):
+            for y in range(world_y):
+                self.canvas.create_rectangle( (world_x-1-x)*scale, (world_y-1-y)*scale, (world_x-1-x+1)*scale, (world_y-1-y+1)*scale, outline="#fff", fill="#000")
+                for i in self.House:
+                    if i.state == True:
+                        i_x = i.location % 4
+                        i_y = i.location // 4
+                        # print(i.location, i_x, i_y)
+                        self.canvas.create_rectangle((world_x - 1 - i_x) * scale, (world_y - 1 - i_y) * scale,
+                                                     (world_x - 1 - i_x + 1) * scale, (world_y - 1 - i_y + 1) * scale,
+                                                     outline="#fff", fill="#ff0")
+
+        root.update()
+        # min_value = -20
+        # max_value = 20
+        # for x in range(world_x):
+        #     for y in range(world_y):
+        #         s = "%d:%d" % (x,y)
+        #         self.canvas.create_rectangle( (world_x-1-x)*scale, (world_y-1-y)*scale, (world_x-1-x+1)*scale, (world_y-1-y+1)*scale, outline="#fff", fill="#000")
+        #         for action in range(4):
+        #             if not s in self.q_table:
+        #                 continue
+        #             value = self.q_table[s][action]
+        #             color = int( 255 * ( value - min_value ) / ( max_value - min_value )) # map value to 0-255
+        #             color = max( min( color, 255 ), 0 ) # ensure within [0,255]
+        #             color_string = '#%02x%02x%02x' % (255-color, color, 0)
+        #             self.canvas.create_oval( (world_x - 1 - x + action_positions[action][0] - action_radius ) *scale,
+        #                                      (world_y - 1 - y + action_positions[action][1] - action_radius ) *scale,
+        #                                      (world_x - 1 - x + action_positions[action][0] + action_radius ) *scale,
+        #                                      (world_y - 1 - y + action_positions[action][1] + action_radius ) *scale,
+        #                                      outline=color_string, fill=color_string )
+        # if curr_x is not None and curr_y is not None:
+        #     self.canvas.create_oval( (world_x - 1 - curr_x + 0.5 - curr_radius ) * scale,
+        #                              (world_y - 1 - curr_y + 0.5 - curr_radius ) * scale,
+        #                              (world_x - 1 - curr_x + 0.5 + curr_radius ) * scale,
+        #                              (world_y - 1 - curr_y + 0.5 + curr_radius ) * scale,
+        #                              outline="#fff", fill="#fff" )
+        # self.root.update()
 
 def load_grid(world_state):
     """
@@ -538,11 +600,12 @@ for i in range(num_repeats):
     print()
     print("Mission", (i + 1), "running.")
 
+    # grid = load_grid(world_state)
+    # print('........', grid)
+
     # Initialize
     a.initialize()
     a.run(agent_host)
 
-    # grid = load_grid(world_state)
-    # print('........', grid)
     # indices = [i for i, x in enumerate(grid) if x == "dark_oak_door"]
     # print("the index of element " + str(indices))

@@ -39,7 +39,7 @@
   <AgentSection mode="Survival">
     <Name>Cristina</Name>
     <AgentStart>
-      <Placement x="6.5" y="5.0" z="6.5" pitch="35" yaw="0"/>
+      <Placement x="6.5" y="5" z="6.5" pitch="30" yaw="180"/>
     </AgentStart>
     <AgentHandlers>
       <!-- <AgentQuitFromTouchingBlockType>
@@ -47,8 +47,8 @@
       </AgentQuitFromTouchingBlockType> -->
       <ObservationFromGrid>
           <Grid name="floorAll">
-            <min x="0" y="0" z="0"/>
-            <max x="5" y="0" z="5"/>
+            <min x="0" y="5" z="0"/>
+            <max x="7" y="5" z="7"/>
           </Grid>
       </ObservationFromGrid>
       <DiscreteMovementCommands/>
