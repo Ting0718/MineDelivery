@@ -3,7 +3,7 @@ layout: default
 title:  Home
 ---
 
-<img src="minecraft.jpg">
+<div style="text-align:center"><img src="minecraft.jpg" width="750" height="500"/></div>
 
 ## Welcome to MineDelivery!
 Our project will simulate a city where many customers continuously order food delivery from a restaurant. Customers will make their orders with certain probability distribution during one day. Input is the number of delivery men, locations of all customers, and time-based distributions of their orders during one day. Our goal is to deliver foods to all customers within shortest cumulative waiting time in one day.
