@@ -17,7 +17,7 @@ For the multi agent, it is much harder for us to just use one cumulative tabular
 
 1. Single Agent:
 
-Single Agent:
+<div style="text-align:center"><img src="single-agent.png" width="750" height="500"/></div>
 
 We are using tabular q_learning with Bellman optimality equation to train our model. By using the Q-Table learning, we store the states, actions and rewards to maintain our Q-Table. 
 
@@ -32,6 +32,8 @@ The current reward for each action during the state is 1000 -(waiting time). Wha
 By compute the q value of each entry in q_table with Bellman optimality equation, we promise that we not only care about the current reward, but also care about the future rewards or impacts if we make the action.
 
 2. Multi Agent:
+
+<div style="text-align:center"><img src="multi-agent.png" width="750" height="500"/></div>
 
 We also using tabular q_learning with Bellman optimality equation approach to train our model. 
 
