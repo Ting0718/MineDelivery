@@ -685,7 +685,7 @@ for i in range(num_repeats):
         a.initialize()
         po = a.best_policy()
         # a.Agent_Location = (0, 0)
-        print("Total waiting time: " + str(a.total_waiting))
+        # print("Total waiting time: " + str(a.total_waiting))
         file.write(str(a.total_waiting) + "\n")
         # if len(po) <= 8:
         #     print("this is the solution:" + str(po))
