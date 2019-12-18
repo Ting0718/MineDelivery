@@ -4,6 +4,9 @@ title:  Final Report
 ---
 
 ## Project Summary
+
+<div style="text-align:center"><img src="Minedelivery.png" width="500" height="300"/></div>
+
 Our project will simulate a city where many customers continuously order food delivery from a restaurant. Customers will make their orders with certain probability during one day. Our agent will need to deliver the food to the locations where the customers are. Input is the number of delivery men and locations of all customers. Our goal is to deliver foods to all customers within shortest cumulative waiting time in one day.
 
 We are using single agent and multi agents to simulate the world, and tabular q_table as an approach to learn the simulation. The reason why we think AI will have helped a lot is because during a big step of training, the ai will make a smart and forecast move.
