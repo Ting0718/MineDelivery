@@ -73,7 +73,7 @@ This is the comparison of our single agent with the baseline agent:
 </p>
 We are choosing an agent who will go to the nearest order place as our baseline agent. As we show in the video, there is a house that is far from other houses. So for the baseline agent, because it will only go to the nearest house, it won’t choose to go the furthest house even though it already has waited a long time which will give him a huge penalty. But for our single agent, as shown in the video, our agent will go to the furthest house at some cases even though there are orders in other nearest houses. In this way, I will consider our agent is smart enough to go to some houses to prevent some huge penalty. The gif here shows an example that our agent will go to the furthest house to prevent some huge penalty.
 <p align="center">
-    <img src="single-agent.gif">
+    <img src="single-agent.GIF">
 </p>
 
 ### Multi-Agent: <br>
@@ -92,7 +92,7 @@ The baseline agent of our multi-agent is there will be two agents: 1. Go to the 
 What's more, if our houses are divided into two clusters, the best solution for our multi agent is able to assign each agent to each cluster. In this way, it will reduce the waiting time most.
 
 <p align="center">
-    <img src="multi-agent.gif">
+    <img src="multi-agent.GIF">
 </p>
  
 ## Resources Used
