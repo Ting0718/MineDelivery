@@ -74,6 +74,7 @@ class world(object):
         self.initialize()
 
     def execute_actions(self, agent_host, action):
+        return
         time.sleep(0.01)
         agent_host.sendCommand(action)
         world_state = agent_host.getWorldState()
@@ -222,11 +223,8 @@ class world(object):
         print("------------------")
         print(self.Clock)
         print("Agent", "to", self.Agent_Location)
-        # for i in self.House:
-        #     print(i.id, i.state)
 
         for i in self.House:
-            # 这里要记得改，因为我们现在是让我们的agent能够站在这个点上，实际上我们可以不让他站到这个点上！
             if i.location == self.Agent_Location and i.state == True:
                 print("Change the house", i.id)
                 i.state = False
@@ -238,44 +236,7 @@ class world(object):
                 i.orderTime = []
                 self.total_waiting += (total)
                 return 1000 - (total)
-                # return 1000 - (self.Clock - i.orderTime)
         return 0
-
-    # def act(self, dir, agent_host):
-    #     if dir == self.agent_face:
-    #         self.Clock += 1
-    #         return 0
-    #
-    #     path = self.get_path(self.Agent_Location, dir)
-    #     extract_action_list = self.extract_action_list_from_path(path)
-    #
-    #     for f in extract_action_list:
-    #         f(agent_host)
-    #
-    #     self.Agent_Location = dir
-    #     self.Clock += (len(path))
-    #
-    #     print("------------------")
-    #     print(self.Clock)
-    #     print("Agent", "to", self.Agent_Location)
-    #     # for i in self.House:
-    #     #     print(i.id, i.state)
-    #
-    #     for i in self.House:
-    #         # 这里要记得改，因为我们现在是让我们的agent能够站在这个点上，实际上我们可以不让他站到这个点上！
-    #         if i.location == self.Agent_Location and i.state == True:
-    #             print("Change the house", i.id)
-    #             i.state = False
-    #             self.deliever_food(agent_host)
-    #             total = 0
-    #             print(i.orderTime)
-    #             for order in i.orderTime:
-    #                 total += self.Clock - order
-    #             i.orderTime = []
-    #             self.total_waiting += (total)
-    #             return 1000 - (total)
-    #             # return 1000 - (self.Clock - i.orderTime)
-    #     return 0
 
     def get_possible_actions(self):
         possibleAction = []
@@ -325,7 +286,7 @@ class world(object):
             else:
                 copy_state.append(i)
 
-        return frozenset(copy_state)
+        return tuple(copy_state)
 
     # def get_actions(self, Agent_Location):
     #     direct = []
@@ -379,25 +340,29 @@ class world(object):
         return returnAction
 
     def update_q_table(self, tau, S, A, R, T):
-        # curr_s = self.transferCurrState(S.popleft())
-        # self.drawQ()
+        
+        # curr_s = S.popleft()
+        # curr_a = A.popleft()
+        # curr_r = R.popleft()
+
+        # G = sum([self.gamma ** i * R[i] for i in range(len(S))])
+        # if tau + self.n < T:
+        #     G += self.gamma ** self.n * self.q_table[agent][S[-1]][A[-1]]
+
+        # old_q = self.q_table[agent][curr_s][curr_a]
+        # self.q_table[agent][curr_s][curr_a] = old_q + self.alpha * (G - old_q)
+        
         curr_s = S.popleft()
         curr_a = A.popleft()
-        curr_r = R.popleft()
-
-        nextMaxReward = 0
-
-        G = sum([self.gamma ** i * R[i] for i in range(len(S))])
-        if tau + self.n < T:
-            G += self.gamma ** self.n * self.q_table[S[-1]][A[-1]]
-
-        old_q = self.q_table[curr_s][curr_a]
-        self.q_table[curr_s][curr_a] = old_q + self.alpha * (G - old_q)
-
-        # if tau + self.n < T:
-        #     # nextMaxReward = max(self.q_table[self.transferCurrState(S[-1])].values())
-        #     nextMaxReward = max(self.q_table[S[-1]].values())
-        # self.q_table[curr_s][curr_a] = curr_r + self.alpha * nextMaxReward # update the q table value
+        R.popleft()
+        if len(S) != 0:
+            nextMaxReward = max(self.q_table[S[0]].values())
+        else:
+            nextMaxReward = 0
+        if len(S) != 0:
+            self.q_table[curr_s][curr_a] = self.q_table[curr_s][curr_a] + self.alpha * (R[0] + self.gamma * nextMaxReward - self.q_table[curr_s][curr_a]) 
+        else:
+            self.q_table[curr_s][curr_a] = self.q_table[curr_s][curr_a] + self.alpha * (self.gamma * nextMaxReward - self.q_table[curr_s][curr_a]) 
 
     def run(self, agent_host):
         S, A, R = deque(), deque(), deque()
@@ -471,7 +436,7 @@ class world(object):
                                                                                            False]) or t == 20:
                         print("End")
                         T = t + 1
-                        S.append('Term State')
+                        #S.append('Term State')
                         present_reward = current_r
                         # print("Reward:", present_reward)
 
