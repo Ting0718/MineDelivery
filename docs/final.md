@@ -39,16 +39,20 @@ We also using tabular q_learning with Bellman optimality equation approach to tr
 
 But multi-agent implementation is much harder than implementation of single agent. One reason is because each agent will finish the action in different times, in this way, the next state that we wish to have will have a big chance won’t show. Consider the case under, <br>
 <p align="center">
-    <img src="multi-agent-case.jpg" width="400" height="300">
+    <img src="multi-agent-case.jpg" width="750" height="500">
 </p>
 We have two agents here: a1, a2 and we have three houses that allow these two agents to go to (h1, h2 and h3).  <br>
+
 State 1 is the current state our multi-agent is facing. A1 and a2 are both at house h2 and after we using q_table to get the best policy (the small right graph under the state 1 is considered as getting the best policy), we want A1 to go to h1 and a2 to go to h3. The next state should be (a1 -> h1, h2, a2->a3). However,since the distance between h1->h2 and h3->h1, it will take different time to require those two agents to arrive.  <br>
+
 Suppose a1 arrives h1 earlier than a2 arrives h3. Because we shouldn't let one agent to wait until another one is finished, we should give a1 a new action to do. In this way, state 2 is considered as a new state that requires our q table to give a new value.
+
 Suppose a2 arrives to h3 now and state 3 is our new state. According to state 1, (a1 arrives to h1 and a2 arrives to h3) is our next state and it is the next targeting state. However, since the a1 arrives h1 earlier than a2 arrives h3, there won't be next targeting state and our reward is seperated in the reward of state 2 + reward of state 3. It is pretty hard to just use one cumulative q_table to do cumulative rewards. What's more, if we are using one cumulative q_table, the action space is also hard to define. For example, when we are at a state and we require our q_table to give us a best policy, they will be possible that only a1 requires an action or both of them requires to give actions. It is also easy to make a mistake to get an action for our one cumulative q_table. <br>
+
 In this way, instead just implementation with one cumulative q_table, we then change to uses multiple q_tables which each of them is corresponding to one agent and it should also work very prefect. Because considers when we choosing the best policy for the agent 1
 When each time one agent finishes its current state, we will give its new action based on its corresponding q_table. The pseudo code is under here <br>
 <p align="center">
-    <img src="pesudo-code-multi-agent.png" width="400" height="150">
+    <img src="pesudo-code-multi-agent.png" width="400" height="300">
 </p>
 Our reward for each q_table is similar as the single-agent one's which is the 1000 -(waiting time) with Bellman optimality equation. When the agent goes to a house that is doesn't have any order (possible that another agent already delivered food to the house), we have give its a negative reward which prevents it choose the same policy in the future.
 
