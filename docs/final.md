@@ -52,7 +52,7 @@ Suppose a1 arrives h1 earlier than a2 arrives h3. Because we shouldn't let one a
 
 Suppose a2 arrives to h3 now and state 3 is our new state. According to state 1, (a1 arrives to h1 and a2 arrives to h3) is our next state and it is the next targeting state. However, since the a1 arrives h1 earlier than a2 arrives h3, there won't be next targeting state and our reward is seperated in the reward of state 2 + reward of state 3. It is pretty hard to just use one cumulative q_table to do cumulative rewards. What's more, if we are using one cumulative q_table, the action space is also hard to define. For example, when we are at a state and we require our q_table to give us a best policy, they will be possible that only a1 requires an action or both of them requires to give actions. It is also easy to make a mistake to get an action for our one cumulative q_table. <br>
 
-In this way, instead just implementation with one cumulative q_table, we then change to uses multiple q_tables which each of them is corresponding to one agent and it should also work very prefect. Because considers when we choosing the best policy for the agent 1
+In this way, instead just implementation with one cumulative q_table, we then change to use multiple q_tables which each of them is corresponding to one agent and it should also work very prefect. Because when we choose the best policy for the agent 1's q_table and agent 2's q_table. The cumulative rewards of these two agents will also be the best solution. <br>
 When each time one agent finishes its current state, we will give its new action based on its corresponding q_table. The pseudo code is under here <br>
 <p align="center">
     <img src="pesudo-code-multi-agent.png" width="500" height="200">
@@ -71,7 +71,10 @@ This is the comparison of our single agent with the baseline agent:
 <p align="center">
     <img src="single_agent_comparison.png">
 </p>
-We are choosing an agent who will go to the nearest order place as our baseline agent. As we show in the video, there is a house that is far from other houses. So for the baseline agent, because it will only go to the nearest house, it won’t choose to go the furthest house even though it already has waited a long time which will give him a huge penalty. But for our single agent, as shown in the video, our agent will go to the furthest house at some cases even though there are orders in other nearest houses. In this way, I will consider our agent is smart enough to go to some houses to prevent some hug penalty.
+We are choosing an agent who will go to the nearest order place as our baseline agent. As we show in the video, there is a house that is far from other houses. So for the baseline agent, because it will only go to the nearest house, it won’t choose to go the furthest house even though it already has waited a long time which will give him a huge penalty. But for our single agent, as shown in the video, our agent will go to the furthest house at some cases even though there are orders in other nearest houses. In this way, I will consider our agent is smart enough to go to some houses to prevent some huge penalty. The gif here shows an example that our agent will go to the furthest house to prevent some huge penalty.
+<p align="center">
+    <img src="single-agent.GIF">
+</p>
 
 ### Multi-Agent: <br>
 s stated in summary, we will use two plot graphs: learning rate and performance comparison as an important factor to evaluate our model. <br>
@@ -85,6 +88,12 @@ This is the comparison of our multi agent with the baseline agent:
     <img src="multi-agent-comparison.png">
 </p>
 The baseline agent of our multi-agent is there will be two agents: 1. Go to the nearest locations and 2. Go to the latest order. Also, we don’t allow them to go to the same location which will also increase our difficult. Because in the ideal multi agents solutions, both of our multi agents should reduce the chance to go to the same locations. But by looking through the comparison graph, we also find out after a long period of training, the waiting time of the multi-agent also beats the baseline agent.
+
+What's more, if our houses are divided into two clusters, the best solution for our multi agent is able to assign each agent to each cluster. In this way, it will reduce the waiting time most.
+
+<p align="center">
+    <img src="multi-agent.GIF">
+</p>
  
 ## Resources Used
 - [Q_Table](https://www.youtube.com/watch?v=Cgx6l19y7q0&t=198s)
