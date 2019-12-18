@@ -55,7 +55,7 @@ Suppose a2 arrives to h3 now and state 3 is our new state. According to state 1,
 In this way, instead just implementation with one cumulative q_table, we then change to uses multiple q_tables which each of them is corresponding to one agent and it should also work very prefect. Because considers when we choosing the best policy for the agent 1
 When each time one agent finishes its current state, we will give its new action based on its corresponding q_table. The pseudo code is under here <br>
 <p align="center">
-    <img src="pesudo-code-multi-agent.png" width="400" height="300">
+    <img src="pesudo-code-multi-agent.png" width="500" height="200">
 </p>
 Our reward for each q_table is similar as the single-agent one's which is the 1000 -(waiting time) with Bellman optimality equation. When the agent goes to a house that is doesn't have any order (possible that another agent already delivered food to the house), we have give its a negative reward which prevents it choose the same policy in the future.
 
