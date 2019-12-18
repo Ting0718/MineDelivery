@@ -18,7 +18,7 @@ For the multi agent, it is much harder for us to just use one cumulative tabular
 
 ## Approaches
 
-1. Single Agent:
+### Single Agent:
 
 <div style="text-align:center"><img src="single-agent.png" width="750" height="500"/></div>
 
@@ -34,7 +34,7 @@ The current reward for each action during the state is 1000 -(waiting time). Wha
 
 By compute the q value of each entry in q_table with Bellman optimality equation, we promise that we not only care about the current reward, but also care about the future rewards or impacts if we make the action.
 
-2. Multi Agent:
+### Multi Agent:
 
 <div style="text-align:center"><img src="multi-agent.png" width="750" height="500"/></div>
 
@@ -74,7 +74,7 @@ This is the comparison of our single agent with the baseline agent:
 We are choosing an agent who will go to the nearest order place as our baseline agent. As we show in the video, there is a house that is far from other houses. So for the baseline agent, because it will only go to the nearest house, it won’t choose to go the furthest house even though it already has waited a long time which will give him a huge penalty. But for our single agent, as shown in the video, our agent will go to the furthest house at some cases even though there are orders in other nearest houses. In this way, I will consider our agent is smart enough to go to some houses to prevent some hug penalty.
 
 ### Multi-Agent: <br>
-s stated in summary, we will use two plot graphs: learning rate and performance comparison as an important factor to evaluate our model. <br>
+As stated in summary, we will use two plot graphs: learning rate and performance comparison as an important factor to evaluate our model. <br>
 <p align="center">
     <img src="multi-agent-learning-rate.png"> 
 </p>
