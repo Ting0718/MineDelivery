@@ -95,6 +95,6 @@ What's more, if our houses are divided into two clusters, the best solution for 
     <img src="multi-agent.GIF">
 </p>
  
-## Resources Used
+## References
 - [Q_Table](https://www.youtube.com/watch?v=Cgx6l19y7q0&t=198s)
 - [Bellman Equation](https://joshgreaves.com/reinforcement-learning/understanding-rl-the-bellman-equations/)
