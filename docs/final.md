@@ -3,6 +3,9 @@ layout: default
 title:  Final Report
 ---
 
+## Video Report
+<iframe width="790" height="494" src="https://www.youtube.com/embed/acQYBtJmutg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Project Summary
 
 <div style="text-align:center"><img src="Minedelivery.png"/></div>
